@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday Utpal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --hue: 260; --p: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif; color: #fff;
+    background: radial-gradient(circle at 50% 40%, hsl(var(--hue) 70% 32%), hsl(calc(var(--hue) + 40) 70% 12%));
+    user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+    display: flex; align-items: center; justify-content: center; transition: background .3s;
+  }
+  .stage { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 20px; text-align: center; z-index: 2; }
+  .stage.shake { animation: shake .12s linear; }
+  @keyframes shake {
+    25% { transform: translate(calc(var(--p) * -6px), calc(var(--p) * 4px)); }
+    50% { transform: translate(calc(var(--p) * 5px), calc(var(--p) * -5px)); }
+    75% { transform: translate(calc(var(--p) * -4px), calc(var(--p) * -3px)); }
+  }
+  .title { font-family: 'Luckiest Guy', cursive; letter-spacing: 2px; line-height: .95; margin: 0; }
+  .intro { font-size: clamp(26px, 6vw, 46px); text-shadow: 0 4px 0 rgba(0,0,0,.35); }
+  .hint { font-size: clamp(16px, 3.5vw, 22px); font-weight: 800; opacity: .9; min-height: 1.4em; }
+
+  /* the cat: a crop window onto the 16:9 green-screen frame (thumbnail before, live video after) */
+  .cat { position: relative; cursor: pointer; outline: none; perspective: 900px; touch-action: manipulation;
+         width: min(64vw, 340px); }
+  .cat:focus-visible { outline: 4px dashed #fff8; outline-offset: 8px; border-radius: 20px; }
+  .spin { transform-style: preserve-3d; --wa: 6deg; --wd: 1.6s; animation: wobble var(--wd) ease-in-out infinite alternate; }
+  @keyframes wobble { from { transform: rotateY(calc(var(--wa) * -1)); } to { transform: rotateY(var(--wa)); } }
+  .squish.boop { animation: boop .14s ease-out; }
+  @keyframes boop { 0% { transform: scale(1); } 40% { transform: scale(.88, .94); } 100% { transform: scale(1); } }
+  .crop { position: relative; width: 100%; aspect-ratio: 1.147; overflow: hidden; }
+  .crop > img, .crop > iframe, .crop > #yt {
+    position: absolute; left: -75%; top: -29%; width: 250%; height: 161.3%;
+    border: 0; pointer-events: none; filter: url(#key) drop-shadow(0 12px 14px rgba(0,0,0,.45));
+  }
+  .crop > img { object-fit: cover; }
+  .crop > #yt { opacity: 0; filter: none; } /* the video has its own space background: no key */
+  body.party.live .cat { width: min(92vw, 600px); cursor: pointer; }
+  /* shows x 18-82%, y 15-84% of the video: the cat, without YouTube's title bar / logo / "More videos" strip */
+  body.party.live .cat .crop { aspect-ratio: 1.649; border-radius: 22px; box-shadow: 0 0 0 4px #fff9, 0 18px 40px rgba(0,0,0,.5); }
+  body.party.live .crop > #yt { left: -28.1%; top: -21.7%; width: 156.25%; height: 144.9%; }
+
+  .meter { width: min(80vw, 360px); }
+  .bar { height: 18px; border-radius: 99px; background: rgba(255,255,255,.18); overflow: hidden; border: 2px solid rgba(255,255,255,.35); }
+  .fill { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #ff4d6d, #ffbe0b, #3ae374, #3a86ff, #c77dff);
+          background-size: 360px 100%; transition: width .12s ease-out; }
+  .count { margin-top: 6px; font-weight: 800; font-size: 15px; opacity: .85; }
+  .tip { font-size: 13px; opacity: .6; }
+
+  .pop { position: fixed; z-index: 5; pointer-events: none; font-family: 'Luckiest Guy', cursive; font-size: 28px; color: #fff;
+         text-shadow: 0 3px 0 #0006; animation: pop .8s ease-out forwards; }
+  @keyframes pop { 0% { transform: translate(-50%, -50%) scale(.6) rotate(var(--r)); opacity: 1; }
+                   100% { transform: translate(calc(-50% + var(--dx)), -160%) scale(1.25) rotate(var(--r)); opacity: 0; } }
+
+  /* ---------- party ---------- */
+  .party-only { display: none; }
+  body.party .party-only { display: flex; }
+  body.party .click-only { display: none; }
+  @property --spin { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+  body.party { background: conic-gradient(from var(--spin, 0deg) at 50% 45%, #ff4d6d, #ffbe0b, #3ae374, #3a86ff, #c77dff, #ff4d6d);
+               animation: disco 4s linear infinite; }
+  @keyframes disco { to { --spin: 360deg; } }
+  body.party::before { content: ''; position: fixed; inset: 0; z-index: 0; animation: beat .4s ease-out infinite; }
+  @keyframes beat { 0% { background: rgba(20, 8, 40, .35); } 100% { background: rgba(20, 8, 40, .6); } }
+  body.party .spin { animation: none; }
+  body.party.live .crop > #yt { opacity: 1; }
+  body.party.live .cat .crop > img { opacity: 0; }
+  body.party:not(.live) .spin { animation: oiia .42s linear infinite; } /* video failed: spin the photo instead */
+  @keyframes oiia { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+
+  .bday { flex-direction: column; align-items: center; gap: 4px; }
+  .bday .l1 { font-size: clamp(30px, 7.5vw, 64px); }
+  .bday .l2 { font-size: clamp(64px, 18vw, 150px); }
+  .bday span.ch { display: inline-block; animation: bounce .8s ease-in-out infinite, rainbow 1.6s linear infinite; text-shadow: 0 5px 0 rgba(0,0,0,.35); }
+  @keyframes bounce { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+  @keyframes rainbow { 0% { color: #ff6b8b; } 20% { color: #ffd23f; } 40% { color: #5cf28a; } 60% { color: #5ab0ff; } 80% { color: #d79bff; } 100% { color: #ff6b8b; } }
+  .from { font-size: clamp(20px, 4.5vw, 30px); font-weight: 800; text-shadow: 0 3px 0 #0005; }
+  .controls { gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .controls button, .controls a {
+    font: 800 15px 'Nunito', sans-serif; color: #fff; text-decoration: none; cursor: pointer;
+    background: rgba(255,255,255,.16); border: 2px solid rgba(255,255,255,.5); padding: 9px 16px; border-radius: 99px; backdrop-filter: blur(4px);
+  }
+  .controls button:hover, .controls a:hover { background: rgba(255,255,255,.3); }
+
+  /* sound tip only when the YouTube player loaded; big play link only when it didn't (e.g. inside a claude.ai artifact) */
+  .tip { display: none; }
+  body.yt-ok:not(.party) .tip { display: block; }
+  .playbig { display: none; }
+  body.party:not(.live) .playbig {
+    display: inline-block; font: 400 clamp(22px, 5vw, 32px) 'Luckiest Guy', cursive; letter-spacing: 1px;
+    color: #fff; text-decoration: none; background: #ff0033; padding: 14px 28px; border-radius: 99px;
+    box-shadow: 0 6px 0 #a00022, 0 12px 30px rgba(0,0,0,.4); animation: pulse .8s ease-in-out infinite;
+  }
+  body.party:not(.live) #ytSmall, body.party:not(.live) #muteBtn { display: none; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+  .flash { position: fixed; inset: 0; background: #fff; z-index: 6; pointer-events: none; opacity: 0; }
+  .flash.go { animation: flash .6s ease-out; }
+  @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
+
+  .mini { position: fixed; z-index: 1; width: 90px; perspective: 600px; pointer-events: none; animation: drop .5s ease-out; }
+  .mini .spin { animation: oiia .5s linear infinite !important; }
+  @keyframes drop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bday span.ch { animation: rainbow 1.6s linear infinite; }
+    body.party { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- green-screen key for the thumbnail photo: alpha = 2R - 3G + 2B + 1 (pure green -> transparent); light green despill -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="key" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="1 0 0 0 0   0.25 0.5 0.25 0 0   0 0 1 0 0   2 -3 2 0 1"/>
+  </filter>
+</svg>
+
+<canvas id="confetti"></canvas>
+<div class="flash" id="flash"></div>
+
+<main class="stage" id="stage">
+  <h1 class="title intro click-only">Psst, Utpal...</h1>
+  <div class="title bday party-only" aria-live="polite"><div class="l1" id="l1"></div><div class="l2" id="l2"></div></div>
+
+  <div class="cat" id="cat" role="button" tabindex="0" aria-label="Click the cat">
+    <div class="spin" id="spin"><div class="squish" id="squish"><div class="crop">
+      <img id="catImg" src="cat.jpg" alt="The OIIA cat">
+      <div id="yt"></div>
+    </div></div></div>
+  </div>
+
+  <div class="hint click-only" id="hint">Spam click the cat 🐱</div>
+  <div class="meter click-only">
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count">0 / 25</div>
+  </div>
+  <div class="tip">🔊 sound on</div>
+
+  <a class="playbig" href="https://www.youtube.com/watch?v=IxX_QHay02M" target="_blank" rel="noopener">▶ PLAY THE OIIA 🔊</a>
+  <div class="from party-only">From us 💛</div>
+  <div class="controls party-only">
+    <button id="muteBtn" type="button">🔊 Mute</button>
+    <button id="againBtn" type="button">↺ Again</button>
+    <a id="ytSmall" href="https://www.youtube.com/watch?v=IxX_QHay02M" target="_blank" rel="noopener">Open on YouTube ↗</a>
+  </div>
+</main>
+
+<script>
+(() => {
+  const GOAL = 25, VID = 'IxX_QHay02M';
+  const $ = id => document.getElementById(id);
+  const body = document.body, stage = $('stage'), squish = $('squish'), spin = $('spin'), cat = $('cat');
+  let clicks = 0, partying = false;
+
+  function letters(el, text, offset) {
+    [...text].forEach((c, i) => {
+      const s = document.createElement('span');
+      s.className = 'ch'; s.textContent = c === ' ' ? ' ' : c;
+      s.style.animationDelay = `${(i + offset) * -0.08}s, ${(i + offset) * -0.12}s`;
+      el.appendChild(s);
+    });
+  }
+  letters($('l1'), 'HAPPY BIRTHDAY', 0);
+  letters($('l2'), 'UTPAL', 14);
+
+  // ---------- the original song, via the official YouTube player ----------
+  let player = null, ready = false, failed = false, muted = false, pauseT = null;
+  window.onYouTubeIframeAPIReady = () => {
+    player = new YT.Player('yt', {
+      videoId: VID,
+      playerVars: { controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1, iv_load_policy: 3, modestbranding: 1 },
+      events: {
+        onReady: () => { if (!failed) { ready = true; body.classList.add('yt-ok'); } },
+        onError: () => { failed = true; body.classList.remove('live'); },
+        onStateChange: e => {
+          if (e.data === YT.PlayerState.ENDED && partying) { player.seekTo(0, true); player.playVideo(); }
+        },
+      },
+    });
+  };
+  const api = document.createElement('script');
+  api.src = 'https://www.youtube.com/iframe_api';
+  api.onerror = () => { failed = true; };
+  document.head.appendChild(api);
+  setTimeout(() => { if (!ready) failed = true; }, 8000); // blocked silently (artifact sandbox): use the photo + play button
+
+  let vol = 0;
+  function setVol(v) { vol = v; if (ready && !muted) try { player.setVolume(v); } catch (e) {} }
+  function play() {
+    if (!ready || failed) return;
+    try {
+      if (!muted) player.unMute();
+      if (player.getPlayerState() !== YT.PlayerState.PLAYING) player.playVideo();
+    } catch (e) {}
+  }
+  // each click turns the song up; it fades when he stops and pauses after 1.5s idle,
+  // so spam clicking = continuous OIIA
+  function burstOfSong() {
+    setVol(100);
+    play();
+    clearTimeout(pauseT);
+    pauseT = setTimeout(() => { if (!partying && ready) try { player.pauseVideo(); } catch (e) {} }, 1500);
+  }
+  setInterval(() => { if (!partying && vol > 0) setVol(Math.max(0, vol - 10)); }, 80);
+
+  // ---------- confetti ----------
+  const cv = $('confetti'), cx = cv.getContext('2d');
+  let parts = [], raf = null;
+  const COLORS = ['#ff4d6d', '#ffbe0b', '#3ae374', '#3a86ff', '#c77dff', '#ffffff'];
+  function size() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+  addEventListener('resize', size); size();
+  function add(p) { if (parts.length < 700) parts.push(Object.assign({ w: 6 + Math.random() * 7, h: 4 + Math.random() * 5,
+    r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: COLORS[(Math.random() * COLORS.length) | 0] }, p)); }
+  function burst(x, y, n, spread = 1) {
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = (3 + Math.random() * 9) * spread;
+      add({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 6 }); }
+    if (!raf) raf = requestAnimationFrame(draw);
+  }
+  function draw() {
+    const dpr = devicePixelRatio;
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, innerWidth, innerHeight);
+    if (partying && Math.random() < 0.5) for (let i = 0; i < 2; i++)
+      add({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 3 });
+    parts = parts.filter(p => p.y < innerHeight + 30);
+    for (const p of parts) {
+      p.vy += 0.22; p.vx *= 0.985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.scale(1, Math.cos(p.r * 2));
+      cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore();
+    }
+    raf = parts.length || partying ? requestAnimationFrame(draw) : null;
+  }
+
+  // ---------- click phase ----------
+  const WORDS = ['oi', 'OI!', 'i', 'iia', 'oiia?', 'a', 'OIIA', 'i i'];
+  const HINTS = [[0, 'Spam click the cat 🐱'], [4, 'keep going...'], [10, 'faster!!'], [16, 'it\'s charging up...'], [21, 'ALMOST!!!']];
+  function popWord(x, y) {
+    const s = document.createElement('span');
+    s.className = 'pop'; s.textContent = WORDS[(Math.random() * WORDS.length) | 0];
+    s.style.left = x + 'px'; s.style.top = y + 'px';
+    s.style.setProperty('--dx', ((Math.random() - .5) * 120) + 'px');
+    s.style.setProperty('--r', ((Math.random() - .5) * 40) + 'deg');
+    document.body.appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
+  }
+  function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  function onCat(e) {
+    const r = cat.getBoundingClientRect();
+    const x = e.clientX || r.left + r.width / 2, y = e.clientY || r.top + r.height / 3;
+    if (partying) { burst(x, y, 40); addMini(); return; }
+
+    clicks++;
+    const p = clicks / GOAL;
+    burstOfSong();
+    popWord(x, y);
+    burst(x, y, 4 + clicks, 0.6);
+    restart(squish, 'boop');
+    body.style.setProperty('--hue', 260 - p * 220);
+    stage.style.setProperty('--p', p);
+    restart(stage, 'shake');
+    spin.style.setProperty('--wa', (6 + p * 70) + 'deg');
+    spin.style.setProperty('--wd', (1.6 - p * 1.35) + 's');
+    $('fill').style.width = (p * 100) + '%';
+    $('count').textContent = `${clicks} / ${GOAL}`;
+    $('hint').textContent = HINTS.filter(h => clicks >= h[0]).pop()[1];
+    if (clicks >= GOAL) party();
+  }
+
+  // ---------- party ----------
+  let miniTimer = null;
+  function addMini() {
+    if (document.querySelectorAll('.mini').length >= 14) return;
+    const m = document.createElement('div');
+    m.className = 'mini';
+    m.innerHTML = `<div class="spin"><div class="crop"><img src="${$('catImg').src}" alt=""></div></div>`;
+    m.style.left = (Math.random() * (innerWidth - 90)) + 'px';
+    m.style.top = (Math.random() * (innerHeight - 90)) + 'px';
+    m.firstChild.style.animationDuration = (0.35 + Math.random() * 0.4) + 's';
+    document.body.appendChild(m);
+  }
+  function party() {
+    partying = true;
+    clearTimeout(pauseT);
+    restart($('flash'), 'go');
+    body.classList.add('party');
+    if (ready && !failed) body.classList.add('live');
+    setVol(100);
+    play();
+    cat.setAttribute('aria-label', 'Happy birthday Utpal! Click the cat for more cats');
+    burst(innerWidth / 2, innerHeight / 2, 220, 1.6);
+    miniTimer = setInterval(addMini, 1300);
+  }
+  function reset() {
+    partying = false; clicks = 0;
+    clearInterval(miniTimer);
+    if (ready) try { player.pauseVideo(); player.seekTo(0, true); } catch (e) {}
+    document.querySelectorAll('.mini').forEach(m => m.remove());
+    body.classList.remove('party', 'live');
+    body.style.setProperty('--hue', 260); stage.style.setProperty('--p', 0);
+    spin.style.setProperty('--wa', '6deg'); spin.style.setProperty('--wd', '1.6s');
+    $('fill').style.width = '0'; $('count').textContent = `0 / ${GOAL}`; $('hint').textContent = HINTS[0][1];
+    cat.setAttribute('aria-label', 'Click the cat');
+  }
+
+  cat.addEventListener('click', onCat);
+  cat.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCat(e); } });
+  $('againBtn').addEventListener('click', reset);
+  $('muteBtn').addEventListener('click', () => {
+    muted = !muted;
+    if (ready) try { if (muted) player.mute(); else { player.unMute(); player.setVolume(vol); } } catch (e) {}
+    $('muteBtn').textContent = muted ? '🔇 Unmute' : '🔊 Mute';
+  });
+
+  // read-only state for automated checks
+  window.__bday = {
+    get clicks() { return clicks; }, get partying() { return partying; }, get ready() { return ready; }, get failed() { return failed; },
+    get state() { try { return player.getPlayerState(); } catch (e) { return null; } },
+    get muted() { try { return player.isMuted(); } catch (e) { return null; } },
+    get time() { try { return player.getCurrentTime(); } catch (e) { return null; } },
+  };
+})();
+</script>
+</body>
+</html>
